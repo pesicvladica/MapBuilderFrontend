@@ -6,21 +6,24 @@ import { Point } from "ol/geom";
 import { fromLonLat } from "ol/proj";
 import { Style, Icon } from "ol/style";
 
-const MapMarker = (longitude, latitude, selected) => {
+export const MapMarker = (longitude, latitude) => {
   const marker = new Feature({
     geometry: new Point(fromLonLat([longitude, latitude])),
   });
-
-  marker.setStyle(
-    new Style({
-      image: new Icon({
-        src: selected ? red : blue,
-        scale: 0.5,
-      }),
-    })
-  );
-
+  marker.setStyle(NormalMarkerStyle);
   return marker;
 };
 
-export default MapMarker;
+export const NormalMarkerStyle = new Style({
+  image: new Icon({
+    src: blue,
+    scale: 1,
+  }),
+});
+
+export const SelectedMarkerStyle = new Style({
+  image: new Icon({
+    src: red,
+    scale: 2,
+  }),
+});
