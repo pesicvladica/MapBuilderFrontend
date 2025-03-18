@@ -1,0 +1,23 @@
+.containerStyle {
+    width: 200pt;
+    height: 50vh;
+    padding: 10px 10px;
+    background-color: #7f99b6;
+    color: #854141;
+    border: 2px solid #854141;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+.closeButton {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.deleteButton {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+}

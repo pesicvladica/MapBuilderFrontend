@@ -1,11 +1,12 @@
 import styles from "./MapView.module.css";
 
-import {
-  MapMarker,
-  NormalMarkerStyle,
-  SelectedMarkerStyle,
-} from "../MapMarker/MapMarker";
+import { CustomMarker } from "../MapMarker/CustomMarker";
 
+import {
+  SelectMapMarkerInteraction,
+  CreateMapMarkerInteraction,
+  DeleteMapMarkerInteraction,
+} from "./MapInteraction";
 import usePrevious from "../../utilities/usePrevious";
 import { initialLocation } from "../../constants/TestingHelpers";
 
@@ -18,12 +19,16 @@ import { Tile as TileLayer, Vector as LayerVector } from "ol/layer";
 import { OSM, Vector as SourceVector } from "ol/source";
 import { toLonLat } from "ol/proj";
 
-const MapView = ({ onMapPressed, markers, onMarkerSelected }) => {
+import Modify from "ol/interaction/Modify";
+import { set } from "ol/transform";
+
+const MapView = ({ onMapInteracted }) => {
   const [map, setMap] = useState(null);
+  const [markers, setMarkers] = useState([]);
 
   const [markerSource, setMarkerSource] = useState(new SourceVector());
-  const [selectedFeature, setSelectedFeature] = useState(null);
-  const previousSelection = usePrevious(selectedFeature);
+  const [selectedMarker, setSelectedMarker] = useState(null);
+  const previousSelection = usePrevious(selectedMarker);
 
   // MARK: - Setup
 
@@ -37,14 +42,15 @@ const MapView = ({ onMapPressed, markers, onMarkerSelected }) => {
     newMap.setLayers([rasterLayer, vectorLayer]);
 
     newMap.on("click", (event) => {
-
       var features = newMap.getFeaturesAtPixel(event.pixel);
       if (features.length === 0) {
-        setSelectedFeature(null);
-        onMapPressed(toLonLat(event.coordinate));
+        setSelectedMarker(null);
+        onMapInteracted([new SelectMapMarkerInteraction(null)]);
+
+        createMarkerForCoordinate(toLonLat(event.coordinate));
       } else {
-        setSelectedFeature(features[0]);
-        onMarkerSelected(features[0]);
+        setSelectedMarker(features[0]);
+        onMapInteracted([new SelectMapMarkerInteraction(features[0])]);
       }
     });
 
@@ -52,29 +58,72 @@ const MapView = ({ onMapPressed, markers, onMarkerSelected }) => {
     return () => newMap.setTarget(null);
   }, []);
 
+  // MARK: - Update
+
   useEffect(() => {
-    if (!map) { return; }
+    if (!map) {
+      return;
+    }
+
+    console.log(
+      `Marker length: ${markers.length} - markers: ${markers}`,
+      markers
+    );
 
     if (markerSource.getFeatures().length === markers.length) {
       if (previousSelection) {
-        previousSelection.setStyle(NormalMarkerStyle);
+        previousSelection.setSelected(false);
       }
 
-      if (selectedFeature) {
-        selectedFeature.setStyle(SelectedMarkerStyle);
+      if (selectedMarker) {
+        selectedMarker.setSelected(true);
       }
     } else {
-      const mapMarkers = markers.map((marker) => {
-        const mapMarker = MapMarker(marker[0], marker[1]);
-        mapMarker.setStyle(NormalMarkerStyle);
-        return mapMarker;
-      });
+      const newMarkers = markers
+        .filter(
+          (marker) =>
+            !markerSource
+              .getFeatures()
+              .find((feature) => feature.getId() === marker.getId())
+        );
 
-      markerSource.clear();
-      markerSource.addFeatures(mapMarkers);
+      const oldMarkers = markerSource
+        .getFeatures()
+        .filter(
+          (feature) =>
+            !markers
+              .find((marker) => marker.getId() === feature.getId())
+        );
+
+      console.log("New markers: ", newMarkers);
+      console.log("Old markers: ", oldMarkers);
+
+      markerSource.addFeatures(newMarkers);
+      markerSource.removeFeatures(oldMarkers);
     }
+  }, [markers, selectedMarker]);
 
-  }, [markers, selectedFeature]);
+  // MARK: - Handlers
+
+  const onDeleteListener = (markerToDelete) => {
+    setMarkers((old) => old.filter((marker) => marker !== markerToDelete));
+
+    onMapInteracted([new DeleteMapMarkerInteraction(markerToDelete)]);
+  };
+
+  // MARK: - Helpers
+
+  const createMarkerForCoordinate = (coordinate) => {
+    const newMarker = new CustomMarker(
+      coordinate[0],
+      coordinate[1],
+      onDeleteListener
+    );
+
+    setMarkers((old) => [...old, newMarker]);
+
+    onMapInteracted([new CreateMapMarkerInteraction(newMarker)]);
+  };
 
   // MARK: - Render
 
