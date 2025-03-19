@@ -37,12 +37,6 @@ function App() {
     });
   };
 
-  // MARK: - Configuration handlers
-
-  const onConfigurationClose = () => {
-    setSelectedMarker(null);
-  };
-
   // MARK: - Form handler
 
   const submitButtonHandler = () => {
@@ -61,7 +55,6 @@ function App() {
         <MarkerConfiguration
           className={styles.configuration}
           marker={selectedMarker}
-          onClosePressed={onConfigurationClose}
         />
       )}
 

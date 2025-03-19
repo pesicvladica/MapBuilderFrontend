@@ -19,19 +19,19 @@ class MapInteraction {
   }
 }
 
-export class CreateMapMarkerInteraction extends MapInteraction {
+export class CreateMarkerMapInteraction extends MapInteraction {
   constructor(object) {
     super(MapInteractionType.CREATE_MARKER, object);
   }
 }
 
-export class SelectMapMarkerInteraction extends MapInteraction {
+export class SelectMarkerMapInteraction extends MapInteraction {
   constructor(object) {
     super(MapInteractionType.SELECT_MARKER, object);
   }
 }
 
-export class DeleteMapMarkerInteraction extends MapInteraction {
+export class DeleteMarkerMapInteraction extends MapInteraction {
   constructor(object) {
     super(MapInteractionType.DELETE_MARKER, object);
   }

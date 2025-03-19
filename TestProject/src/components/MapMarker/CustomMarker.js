@@ -1,6 +1,12 @@
 import blue from "./MarkerIconBlue.svg";
 import red from "./MarkerIconRed.svg";
 
+import {
+  DeleteInteraction,
+  DeselectInteraction,
+  SelectInteraction,
+} from "./MarkerInteraction";
+
 import { Feature } from "ol";
 import { Point } from "ol/geom";
 import { fromLonLat } from "ol/proj";
@@ -9,37 +15,38 @@ import { Style, Icon } from "ol/style";
 let nextMarkerId = 1;
 
 export class CustomMarker extends Feature {
-
-  constructor(longitude, latitude, onDeleteListener) {
+  constructor(longitude, latitude, onInteractionListener) {
     super({
       geometry: new Point(fromLonLat([longitude, latitude])),
     });
-    this.setId(nextMarkerId ++);
+    this.setId(nextMarkerId++);
     this.setStyle(NormalMarkerStyle);
 
     this.longitude = longitude;
     this.latitude = latitude;
 
-    this.onDeleteListener = onDeleteListener;
+    this.onInteractionListener = onInteractionListener;
   }
 
-  setSelected(isSelected) {
-    if (isSelected) {
-      this.setStyle(SelectedMarkerStyle);
-    } else {
-      this.setStyle(NormalMarkerStyle);
+  select() {
+    this.setStyle(SelectedMarkerStyle);
+    if (this.onInteractionListener) {
+      this.onInteractionListener(new SelectInteraction(this));
+    }
+  }
+
+  deselect() {
+    this.setStyle(NormalMarkerStyle);
+    if (this.onInteractionListener) {
+      this.onInteractionListener(new DeselectInteraction(this));
     }
   }
 
   delete() {
-    if (this.onDeleteListener) {
-      this.onDeleteListener(this);
+    if (this.onInteractionListener) {
+      this.onInteractionListener(new DeleteInteraction(this));
     }
   }
-
-  isEqualTo({latitude, longitude}) {
-    return this.longitude === longitude && this.latitude === latitude;
-  } 
 }
 
 const NormalMarkerStyle = new Style({

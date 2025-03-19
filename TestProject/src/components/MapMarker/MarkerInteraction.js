@@ -1,6 +1,6 @@
 export const MarkerInteractionType = {
-  CREATE: "Create",
   SELECT: "Select",
+  DESELECT: "Deselect",
   DELETE: "Delete",
 };
 
@@ -19,15 +19,15 @@ class MarkerInteraction {
   }
 }
 
-export class SelectionInteraction extends MarkerInteraction {
+export class SelectInteraction extends MarkerInteraction {
   constructor(object) {
     super(MarkerInteractionType.SELECT, object);
   }
 }
 
-export class CreateInteraction extends MarkerInteraction {
+export class DeselectInteraction extends MarkerInteraction {
   constructor(object) {
-    super(MarkerInteractionType.CREATE, object);
+    super(MarkerInteractionType.DESELECT, object);
   }
 }
 
