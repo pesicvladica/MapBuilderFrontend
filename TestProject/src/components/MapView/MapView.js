@@ -117,11 +117,7 @@ const MapView = ({ onMapInteracted }) => {
 
   const onMapSingleClickHandler = useCallback(
     (event) => {
-      if (!map) {
-        return;
-      }
-
-      var clickedMarkers = map.getFeaturesAtPixel(event.pixel);
+      var clickedMarkers = map?.getFeaturesAtPixel(event.pixel);
       if (clickedMarkers.length === 0) {
         // Deselect selected marker if any otherwise create new marker
         if (selectedMarker) {
@@ -139,15 +135,11 @@ const MapView = ({ onMapInteracted }) => {
 
   const onMapPointerDrag = useCallback(
     (event) => {
-      if (!map) {
-        return;
-      }
-
       // Check if marker is selected on pointer down
       // Also if that pointer is currently selected marker
       // In that case move marker by draging
       // Otherwise move map
-      var markerId = map.getFeaturesAtPixel(event.pixel)[0]?.getId();
+      var markerId = map?.getFeaturesAtPixel(event.pixel)[0]?.getId();
       if (markerId === selectedMarker?.getId()) {
         selectedMarker.getGeometry().setCoordinates(event.coordinate);
         deactivateInteractions();
