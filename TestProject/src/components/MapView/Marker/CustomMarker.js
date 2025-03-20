@@ -28,6 +28,10 @@ export class CustomMarker extends Feature {
     this.onInteractionListener = onInteractionListener;
   }
 
+  setInteractionListener(listener) {
+    this.onInteractionListener = listener;
+  }
+
   select() {
     this.setStyle(SelectedMarkerStyle);
     if (this.onInteractionListener) {

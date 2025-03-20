@@ -1,3 +1,4 @@
+// Possible interactions that Map view can send to parent
 export const MapInteractionType = {
   CREATE_MARKER: "Create",
   SELECT_MARKER: "Select",

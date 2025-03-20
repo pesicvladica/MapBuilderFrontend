@@ -4,9 +4,9 @@ import MapView from './components/MapView/MapView';
 import SubmitButton from './components/SubmitButton/SubmitButton';
 import MarkerConfiguration from './components/MarkerConfiguration/MarkerConfiguration';
 
-import { MapInteractionType } from "./components/MapView/MapInteraction";
+import { MapInteractionType } from "./components/MapView/MapViewInteraction";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 
 function App() {
   const [markers, setMarkers] = useState([]);
@@ -14,7 +14,7 @@ function App() {
 
   // MARK: - Map handlers 
 
-  const onMapInteractedHandler = (interactions) => {
+  const onMapInteractedHandler = useCallback((interactions) => {
     interactions.forEach(interaction => {
       switch (interaction.getType()) {
         case MapInteractionType.CREATE_MARKER:
@@ -35,7 +35,7 @@ function App() {
           break;
       }
     });
-  };
+  }, []);
 
   // MARK: - Form handler
 
