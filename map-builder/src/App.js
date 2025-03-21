@@ -1,8 +1,8 @@
-import styles from './App.module.css';
+import styles from "./App.module.css";
 
-import MapView from './components/MapView/MapView';
-import SubmitButton from './components/SubmitButton/SubmitButton';
-import MarkerConfiguration from './components/MarkerConfiguration/MarkerConfiguration';
+import MapView from "./components/MapView/MapView";
+import SubmitButton from "./components/SubmitButton/SubmitButton";
+import MarkerConfiguration from "./components/MapView/MarkerConfiguration/MarkerConfiguration";
 
 import { MapInteractionType } from "./components/MapView/MapViewInteraction";
 
@@ -12,10 +12,10 @@ function App() {
   const [markers, setMarkers] = useState([]);
   const [selectedMarker, setSelectedMarker] = useState(null);
 
-  // MARK: - Map handlers 
+  // MARK: - Map handlers
 
   const onMapInteractedHandler = useCallback((interactions) => {
-    interactions.forEach(interaction => {
+    interactions.forEach((interaction) => {
       switch (interaction.getType()) {
         case MapInteractionType.CREATE_MARKER:
           const markerCreated = interaction.getObject();
@@ -43,13 +43,11 @@ function App() {
     console.log("Submitting markers: ", markers);
   };
 
-  // MARK: - Render 
+  // MARK: - Render
 
   return (
     <div className={styles.container}>
-      <MapView
-        onMapInteracted={onMapInteractedHandler}
-      />
+      <MapView onMapInteracted={onMapInteractedHandler} />
 
       {selectedMarker && (
         <MarkerConfiguration
