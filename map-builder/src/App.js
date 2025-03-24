@@ -1,41 +1,16 @@
+import React from "react";
+
 import styles from "./App.module.css";
 
 import MapView from "./components/MapView/MapView";
-import SubmitButton from "./components/SubmitButton/SubmitButton";
-import MarkerConfiguration from "./components/MapView/MarkerConfiguration/MarkerConfiguration";
 
-import { MapInteractionType } from "./components/MapView/MapViewInteraction";
+import MarkerConfiguration from "./components/MarkerConfiguration/MarkerConfiguration";
 
-import React, { useCallback, useState } from "react";
+import { useMapInteractionHandler } from "./components/SubmitForm/Hooks/useMapInteractionHandler";
+import SubmitButton from "./components/SubmitForm/SubmitButton/SubmitButton";
 
 function App() {
-  const [markers, setMarkers] = useState([]);
-  const [selectedMarker, setSelectedMarker] = useState(null);
-
-  // MARK: - Map handlers
-
-  const onMapInteractedHandler = useCallback((interactions) => {
-    interactions.forEach((interaction) => {
-      switch (interaction.getType()) {
-        case MapInteractionType.CREATE_MARKER:
-          const markerCreated = interaction.getObject();
-          setMarkers((old) => [...old, markerCreated]);
-          break;
-        case MapInteractionType.SELECT_MARKER:
-          const markerSelected = interaction.getObject();
-          setSelectedMarker(markerSelected);
-          break;
-        case MapInteractionType.DELETE_MARKER:
-          const markerDeleted = interaction.getObject();
-          setMarkers((old) => old.filter((marker) => marker !== markerDeleted));
-          setSelectedMarker(null);
-          break;
-        default:
-          console.log("Unhandled interaction type: ", interaction.getType());
-          break;
-      }
-    });
-  }, []);
+  const { markers, selectedMarker, onMapInteractedHandler } = useMapInteractionHandler();
 
   // MARK: - Form handler
 
@@ -50,10 +25,9 @@ function App() {
       <MapView onMapInteracted={onMapInteractedHandler} />
 
       {selectedMarker && (
-        <MarkerConfiguration
-          className={styles.configuration}
-          marker={selectedMarker}
-        />
+        <div className={styles.configuration}>
+          <MarkerConfiguration marker={selectedMarker} />
+        </div>
       )}
 
       <SubmitButton

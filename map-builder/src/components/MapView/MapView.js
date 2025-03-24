@@ -1,6 +1,6 @@
 import styles from "./MapView.module.css";
 
-import { location } from "./Helpers/MapViewConstants";
+import { location as defaultLocation } from "./Helpers/MapViewConstants";
 
 import { useMap } from "./Hooks/useMap";
 import { useMapEventInteractions } from "./Hooks/useMapEventInteractions";
@@ -16,7 +16,7 @@ const MapView = ({ onMapInteracted }) => {
 
   const { mapRef, vectorSourceRef } = useMap({
     targetId: mapContainerId,
-    initialLocation: location,
+    initialLocation: defaultLocation,
     canAddMarkers: true,
   });
   
