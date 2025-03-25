@@ -1,10 +1,19 @@
 import { Slider } from "../Slider/Slider";
 import styles from "./MarkerConfiguration.module.css";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 const MarkerConfiguration = ({ marker }) => {
   const [value, setValue] = useState(50); // Initial slider value is 50
+
+  useEffect(() => {
+    setValue(marker.getRadius());
+  }
+  , [marker]);
+
+  useEffect(() => {
+    marker.setRadius(value);
+  }, [marker, value]);
 
   return (
     <div className={styles.containerStyle}>

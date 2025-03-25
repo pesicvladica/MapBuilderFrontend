@@ -14,7 +14,7 @@ export const useMapPointerdrag = ({ mapRef, currentMarkerId }) => {
       const marker = map.getFeaturesAtPixel(event.pixel)?.[0];
       const markerId = marker?.getId();
       if (currentMarkerId && markerId === currentMarkerId) {
-        marker.getGeometry().setCoordinates(event.coordinate);
+        marker.setCoordinates(event.coordinate);
         deactivateInteractions(map);
         return;
       }

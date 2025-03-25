@@ -33,6 +33,12 @@ export const useMap = ({ targetId, initialLocation, canAddMarkers }) => {
       map.addLayer(vectorLayer);
     }
 
+    // Change mouse pointer if hovering above marker
+    map.on("pointermove", (event) => {
+      var hit = map.hasFeatureAtPixel(event.pixel);
+      map.getTargetElement().style.cursor = hit ? "pointer" : "";
+    });
+
     mapRef.current = map;
     return () => map.setTarget(null);
   }, [targetId, initialLocation, canAddMarkers]);
