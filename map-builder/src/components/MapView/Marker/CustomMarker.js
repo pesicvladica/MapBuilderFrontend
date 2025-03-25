@@ -1,5 +1,5 @@
-import blue from "./MarkerIconBlue.svg";
-import red from "./MarkerIconRed.svg";
+import activeMarker from "./LocationActive.svg";
+import inactiveMarker from "./LocationInactive.svg";
 
 import {
   DeleteInteraction,
@@ -10,31 +10,34 @@ import {
 import { Feature } from "ol";
 import { Point } from "ol/geom";
 import { fromLonLat, toLonLat } from "ol/proj";
-import { Style, Icon } from "ol/style";
+import { Style, Icon, Stroke, Fill } from "ol/style";
 
 import Circle from "ol/geom/Circle.js";
 import GeometryCollection from "ol/geom/GeometryCollection";
 
-let nextMarkerId = 1;
-
 export class CustomMarker extends Feature {
-  constructor(longitude, latitude) {
+  static nextMarkerId = 1;
+
+  constructor(longitude, latitude, options = {}) {
     const coordinate = fromLonLat([longitude, latitude]);
-    const defaultRadius = 0;
+    const defaultRadius = options.radius ?? 50;
 
     const point = new Point(coordinate);
     const circle = new Circle(coordinate, defaultRadius);
     const geometry = new GeometryCollection([point, circle]);
 
-    super({ geometry: geometry });
-    this.setId(nextMarkerId++);
-    this.setStyle(NormalMarkerStyle);
+    super({ geometry });
+    this.setId(CustomMarker.nextMarkerId++);
 
     this.longitude = longitude;
     this.latitude = latitude;
 
     this.radius = defaultRadius;
     this.selected = false;
+    this.showCircle = true;
+    this.onInteractionListener = null;
+
+    this.setStyle(normalMarker(this));
   }
 
   setInteractionListener(listener) {
@@ -52,10 +55,7 @@ export class CustomMarker extends Feature {
 
     const collection = this.getGeometry();
 
-    const geometries = collection.getGeometries();
-    const point = geometries[0];
-    const circle = geometries[1];
-
+    const [point, circle] = collection.getGeometries();
     point.setCoordinates(coordinates);
     circle.setCenter(coordinates);
 
@@ -63,20 +63,34 @@ export class CustomMarker extends Feature {
   }
 
   select() {
-    this.selected = true;
+    if (this.selected) {
+      return;
+    }
 
-    this.setStyle(SelectedMarkerStyle);
+    this.selected = true;
+    this.setStyle(selectedMarker(this));
+
     if (this.onInteractionListener) {
       this.onInteractionListener(new SelectInteraction(this));
     }
   }
 
   deselect() {
-    this.selected = false;
+    if (!this.selected) {
+      return;
+    }
 
-    this.setStyle(NormalMarkerStyle);
+    this.selected = false;
+    this.setStyle(normalMarker(this));
+
     if (this.onInteractionListener) {
       this.onInteractionListener(new DeselectInteraction(this));
+    }
+  }
+
+  delete() {
+    if (this.onInteractionListener) {
+      this.onInteractionListener(new DeleteInteraction(this));
     }
   }
 
@@ -86,25 +100,63 @@ export class CustomMarker extends Feature {
 
   setRadius(radius) {
     this.radius = radius;
+    this._updateRadius();
   }
 
-  delete() {
-    if (this.onInteractionListener) {
-      this.onInteractionListener(new DeleteInteraction(this));
-    }
+  toggleCircleVisibility() {
+    this.showCircle = !this.showCircle;
+    this._updateRadius();
+  }
+
+  _updateRadius() {
+    const collection = this.getGeometry();
+
+    const [point, circle] = collection.getGeometries();
+    circle.setRadius(this.showCircle ? this.radius : 0);
+
+    collection.setGeometries([point, circle]);
   }
 }
 
-const NormalMarkerStyle = new Style({
-  image: new Icon({
-    src: blue,
-    scale: 1,
-  }),
-});
+const normalMarker = (marker) => {
+  const styles = [markerNormalStyle];
+  if (marker.showCircle) {
+    styles.push(circleNormalStyle);
+  }
+  return styles;
+};
 
-const SelectedMarkerStyle = new Style({
-  image: new Icon({
-    src: red,
-    scale: 2,
-  }),
-});
+const selectedMarker = (marker) => {
+  const styles = [markerSelectedStyle];
+  if (marker.showCircle) {
+    styles.push(circleSelectedStyle);
+  }
+  return styles;
+};
+
+const markerNormalStyle = createIconStyle(inactiveMarker, 1);
+const markerSelectedStyle = createIconStyle(activeMarker, 1.5);
+function createIconStyle(icon, scale = 1) {
+  return new Style({
+    image: new Icon({
+      src: icon,
+      width: 24 * scale,
+      height: 24 * scale,
+    }),
+  });
+}
+
+const circleNormalStyle = createCircleStyle("0, 0, 255");
+const circleSelectedStyle = createCircleStyle("255, 0, 0");
+function createCircleStyle(color) {
+  return new Style({
+    geometry: (marker) => {
+      if (marker.showCircle) {
+        return marker.getGeometry().getGeometries()[1];
+      }
+      return null;
+    },
+    stroke: new Stroke({ color: `rgba(${color})`, width: 2 }),
+    fill: new Fill({ color: `rgba(${color}, 0.5)` }),
+  });
+}
