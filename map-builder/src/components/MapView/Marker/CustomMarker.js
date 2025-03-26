@@ -30,6 +30,8 @@ export class CustomMarker extends Feature {
     super({ geometry });
     this.setId(CustomMarker.nextMarkerId++);
 
+    this.title = "Custom marker";
+
     this.longitude = longitude;
     this.latitude = latitude;
 
@@ -104,8 +106,15 @@ export class CustomMarker extends Feature {
     this._updateRadius();
   }
 
-  toggleCircleVisibility() {
-    this.showCircle = !this.showCircle;
+  shouldShowCircle() {
+    return this.showCircle;
+  }
+
+  setShouldShowCircle(show) {
+    if (show === this.shouldShowCircle) {
+      return;
+    }
+    this.showCircle = show;
     this._updateRadius();
   }
 
@@ -116,5 +125,13 @@ export class CustomMarker extends Feature {
     circle.setRadius(this.showCircle ? this.radius : 0);
 
     collection.setGeometries([point, circle]);
+  }
+
+  getTitle() {
+    return this.title;
+  }
+
+  setTitle(title) {
+    this.title = title;
   }
 }

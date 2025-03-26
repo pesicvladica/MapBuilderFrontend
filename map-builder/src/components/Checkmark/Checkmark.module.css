@@ -1,0 +1,8 @@
+.labelStyle {
+    width: 100%;
+    display: inline-flex;
+}
+
+.inputField {
+    margin-right: 6px;
+}
