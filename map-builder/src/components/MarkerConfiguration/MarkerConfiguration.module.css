@@ -18,6 +18,10 @@ div h1 {
     font-size: 20px;
 }
 
+.checkMark {
+    flex-direction: column;
+}
+
 .closeButton {
     position: absolute;
     top: 20px;

@@ -4,10 +4,12 @@ import { Checkmark } from "../Checkmark/Checkmark";
 import { Slider } from "../Slider/Slider";
 
 import React, { useEffect, useState } from "react";
+import { TextInput } from "../TextInput/TextInput";
 
 const MarkerConfiguration = ({ marker }) => {
   const [radius, setRadius] = useState(50);
   const [showRadius, setShowRadius] = useState(true);
+  const [maxRadius, setMaxRadius] = useState(100);
 
   useEffect(() => {
     setRadius(marker.getRadius());
@@ -32,17 +34,20 @@ const MarkerConfiguration = ({ marker }) => {
         Close
       </button>
 
-      <Checkmark
-        label={"Show radius"}
-        state={showRadius}
-        setState={(e) => setShowRadius(e.target.checked)}
-      />
+      <div className={styles.checkMark}>
+        <Checkmark
+          label={"Show radius"}
+          state={showRadius}
+          setState={(e) => setShowRadius(e.target.checked)}
+        />
+        {showRadius && (<TextInput label={"Max R: "} value={maxRadius} onChange={(e)=>setMaxRadius(e.target.value)} />)}
+      </div>
 
       {showRadius && (
         <Slider
           title={"Meters"}
           min={0}
-          max={100}
+          max={maxRadius}
           step={1}
           value={radius}
           setValue={setRadius}
