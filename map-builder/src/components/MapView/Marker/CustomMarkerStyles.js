@@ -5,7 +5,7 @@ import { Style, Icon, Stroke, Fill } from "ol/style";
 
 export const normalMarker = (marker) => {
   const styles = [markerNormalStyle];
-  if (marker.showCircle) {
+  if (marker.showRadius) {
     styles.push(circleNormalStyle);
   }
   return styles;
@@ -13,7 +13,7 @@ export const normalMarker = (marker) => {
 
 export const selectedMarker = (marker) => {
   const styles = [markerSelectedStyle];
-  if (marker.showCircle) {
+  if (marker.showRadius) {
     styles.push(circleSelectedStyle);
   }
   return styles;
@@ -39,7 +39,7 @@ const circleSelectedStyle = createCircleStyle("255, 0, 0");
 function createCircleStyle(color) {
   return new Style({
     geometry: (marker) => {
-      if (marker.showCircle) {
+      if (marker.showRadius) {
         return marker.getGeometry().getGeometries()[1];
       }
       return null;

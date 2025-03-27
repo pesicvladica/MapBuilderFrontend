@@ -16,6 +16,9 @@ import { fromLonLat, toLonLat } from "ol/proj";
 import Circle from "ol/geom/Circle.js";
 import GeometryCollection from "ol/geom/GeometryCollection";
 
+/**
+ * Initialization
+ */
 export class CustomMarker extends Feature {
   static nextMarkerId = 1;
 
@@ -30,27 +33,48 @@ export class CustomMarker extends Feature {
     super({ geometry });
     this.setId(CustomMarker.nextMarkerId++);
 
-    this.title = "Custom marker";
+    this.title = options.title ?? "Location marker";
 
     this.longitude = longitude;
     this.latitude = latitude;
 
-    this.radius = defaultRadius;
     this.selected = false;
-    this.showCircle = true;
-    this.onInteractionListener = null;
 
+    this.showRadius = options.showRadius ?? true;
+    this.radius = defaultRadius;
+    this.minRadius = options.minRadius ?? 10;
+    this.maxRadius = options.maxRadius ?? 100;
+
+    this.onInteractionListener = null;
     this.setStyle(normalMarker(this));
   }
+
+  // MARK: - Private methods
+
+  #updateRadius() {
+    const collection = this.getGeometry();
+
+    const [point, circle] = collection.getGeometries();
+    circle.setRadius(this.showRadius ? this.radius : 0);
+
+    collection.setGeometries([point, circle]);
+
+    this.setStyle(this.selected ? selectedMarker(this) : normalMarker(this));
+  }
+
+  // MARK: - Public methods
 
   setInteractionListener(listener) {
     this.onInteractionListener = listener;
   }
 
-  getCoordinates() {
-    return [this.longitude, this.latitude];
+  delete() {
+    if (this.onInteractionListener) {
+      this.onInteractionListener(new DeleteInteraction(this));
+    }
   }
 
+  // Expects map event coordinates
   setCoordinates(coordinates) {
     const [lon, lat] = toLonLat(coordinates);
     this.longitude = lon;
@@ -91,47 +115,16 @@ export class CustomMarker extends Feature {
     }
   }
 
-  delete() {
-    if (this.onInteractionListener) {
-      this.onInteractionListener(new DeleteInteraction(this));
-    }
-  }
-
-  getRadius() {
-    return this.radius;
-  }
-
   setRadius(radius) {
     this.radius = radius;
-    this._updateRadius();
+    this.#updateRadius();
   }
 
-  shouldShowCircle() {
-    return this.showCircle;
-  }
-
-  setShouldShowCircle(show) {
-    if (show === this.shouldShowCircle) {
+  setShowRadius(show) {
+    if (show === this.showRadius) {
       return;
     }
-    this.showCircle = show;
-    this._updateRadius();
-  }
-
-  _updateRadius() {
-    const collection = this.getGeometry();
-
-    const [point, circle] = collection.getGeometries();
-    circle.setRadius(this.showCircle ? this.radius : 0);
-
-    collection.setGeometries([point, circle]);
-  }
-
-  getTitle() {
-    return this.title;
-  }
-
-  setTitle(title) {
-    this.title = title;
+    this.showRadius = show;
+    this.#updateRadius();
   }
 }

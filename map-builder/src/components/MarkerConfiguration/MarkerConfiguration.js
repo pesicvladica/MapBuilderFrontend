@@ -1,57 +1,87 @@
 import styles from "./MarkerConfiguration.module.css";
 
-import { Checkmark } from "../Checkmark/Checkmark";
-import { Slider } from "../Slider/Slider";
+import { Checkmark } from "../CustomViews/Checkmark/Checkmark";
+import { Slider } from "../CustomViews/Slider/Slider";
+import { TextInput } from "../CustomViews/TextInput/TextInput";
 
 import React, { useEffect, useState } from "react";
-import { TextInput } from "../TextInput/TextInput";
 
 const MarkerConfiguration = ({ marker }) => {
-  const [radius, setRadius] = useState(50);
-  const [showRadius, setShowRadius] = useState(true);
-  const [maxRadius, setMaxRadius] = useState(100);
+  const [title, setTitle] = useState(marker.title);
+  const [radius, setRadius] = useState(marker.radius);
+  const [showRadius, setShowRadius] = useState(marker.showRadius);
+  const [minRadius, setMinRadius] = useState(marker.minRadius);
+  const [maxRadius, setMaxRadius] = useState(marker.maxRadius);
 
   useEffect(() => {
-    setRadius(marker.getRadius());
-  }, [marker, setRadius]);
+    setTitle(marker.title);
+    setRadius(marker.radius);
+    setShowRadius(marker.showRadius);
+    setMinRadius(marker.minRadius);
+    setMaxRadius(marker.maxRadius);
+  }, [marker]);
+
+  useEffect(() => {
+    marker.title = title;
+  }, [marker, title])
 
   useEffect(() => {
     marker.setRadius(radius);
   }, [marker, radius]);
 
   useEffect(() => {
-    setShowRadius(marker.shouldShowCircle());
-  }, [marker, setShowRadius]);
+    marker.setShowRadius(showRadius);
+  }, [marker, showRadius]);
 
   useEffect(() => {
-    marker.setShouldShowCircle(showRadius);
-  }, [marker, showRadius]);
+    marker.minRadius = minRadius;
+  }, [marker, minRadius]);
+
+  useEffect(() => {
+    marker.maxRadius = maxRadius;
+  }, [marker, maxRadius]);
 
   return (
     <div className={styles.containerStyle}>
-      <h1>{marker.getTitle()}</h1>
+      <div className={styles.titleField}>
+        <TextInput value={title} onChange={(e) => setTitle(e.target.value)} />
+      </div>
+
       <button className={styles.closeButton} onClick={() => marker.deselect()}>
         Close
       </button>
 
-      <div className={styles.checkMark}>
-        <Checkmark
-          label={"Show radius"}
-          state={showRadius}
-          setState={(e) => setShowRadius(e.target.checked)}
-        />
-        {showRadius && (<TextInput label={"Max R: "} value={maxRadius} onChange={(e)=>setMaxRadius(e.target.value)} />)}
-      </div>
+      <Checkmark
+        label={"Show radius"}
+        state={showRadius}
+        setState={(e) => setShowRadius(e.target.checked)}
+      />
 
       {showRadius && (
-        <Slider
-          title={"Meters"}
-          min={0}
-          max={maxRadius}
-          step={1}
-          value={radius}
-          setValue={setRadius}
-        />
+        <div className={styles.radiusContainer}>
+
+          <div className={styles.radiusSettings}>
+            <TextInput
+              label={"Min Radius"}
+              value={minRadius}
+              onChange={(e) => setMinRadius(e.target.value)}
+            />
+            <TextInput
+              rightLabel={"Max Radius"}
+              value={maxRadius}
+              onChange={(e) => setMaxRadius(e.target.value)}
+            />
+          </div>
+
+          <Slider
+            title={"Meters"}
+            min={minRadius}
+            max={maxRadius}
+            step={1}
+            value={radius}
+            setValue={setRadius}
+          />
+        </div>
       )}
 
       <div className={styles.spacing}></div>

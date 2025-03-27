@@ -7,21 +7,6 @@
     font-size: 14px;
 }
 
-.spacing {
-    width: 100%;
-    height: 30px;
-}
-
-div h1 {
-    margin: none;
-    top: 133px;
-    font-size: 20px;
-}
-
-.checkMark {
-    flex-direction: column;
-}
-
 .closeButton {
     position: absolute;
     top: 20px;
@@ -34,3 +19,37 @@ div h1 {
     left: 50%;
     transform: translateX(-50%);
 }
+
+.spacing {
+    width: 100%;
+    height: 30px;
+}
+
+.titleField {
+    margin: none;
+    top: 133px;
+    margin-top: 12pt;
+    margin-bottom: 10pt;
+    width: 75%;
+}
+
+.titleField input {
+    background-color: transparent;
+    border: none;
+}
+
+.radiusContainer {
+    margin-top: 5pt;
+}
+
+.radiusSettings {
+    display: flex;
+    width: 200pt;
+    gap: 8pt;
+}
+
+.radiusSettings input {
+    flex: 1 1 0;
+    text-align: right;
+}
+

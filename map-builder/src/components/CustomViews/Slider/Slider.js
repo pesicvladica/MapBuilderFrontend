@@ -7,9 +7,10 @@ export function Slider({ title, min, max, step, value, setValue }) {
 
   return (
     <div className={styles.sliderContainer}>
-      <label htmlFor={inputId}>
-        {value} {title}
-      </label>
+      <div className={styles.sliderLabels}>
+        <span>{min}</span>
+        <span>{max}</span>
+      </div>
 
       <div className={styles.sliderWrapper}>
         <input
@@ -25,11 +26,9 @@ export function Slider({ title, min, max, step, value, setValue }) {
           }}
         />
       </div>
-
-      <div className={styles.sliderLabels}>
-        <span>{min}</span>
-        <span>{max}</span>
-      </div>
+      <label htmlFor={inputId}>
+        {value} {title}
+      </label>
     </div>
   );
 }

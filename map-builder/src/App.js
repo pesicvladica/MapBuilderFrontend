@@ -7,7 +7,7 @@ import MapView from "./components/MapView/MapView";
 import MarkerConfiguration from "./components/MarkerConfiguration/MarkerConfiguration";
 
 import { useMapInteractionHandler } from "./components/SubmitForm/Hooks/useMapInteractionHandler";
-import SubmitButton from "./components/SubmitForm/SubmitButton/SubmitButton";
+import SubmitButton from "./components/CustomViews/SubmitButton/SubmitButton";
 
 function App() {
   const { markers, selectedMarker, onMapInteractedHandler } = useMapInteractionHandler();

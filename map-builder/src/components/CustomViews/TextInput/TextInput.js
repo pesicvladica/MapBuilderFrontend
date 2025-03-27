@@ -4,6 +4,7 @@ import React from "react";
 
 export function TextInput({
   label,
+  rightLabel,
   value,
   onChange,
   placeholder = "",
@@ -20,6 +21,7 @@ export function TextInput({
         placeholder={placeholder}
         disabled={disabled}
       />
+      {rightLabel && <label className={styles.rightLabel}>{rightLabel}</label>}
     </div>
   );
 }
