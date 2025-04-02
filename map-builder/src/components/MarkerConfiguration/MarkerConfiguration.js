@@ -4,72 +4,116 @@ import { Checkmark } from "../CustomViews/Checkmark/Checkmark";
 import { Slider } from "../CustomViews/Slider/Slider";
 import { TextInput } from "../CustomViews/TextInput/TextInput";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useReducer } from "react";
+import { MarkerComponentEvents } from "../MapView/Marker/MarkerComponentEvents";
 
 const MarkerConfiguration = ({ marker }) => {
-  const [title, setTitle] = useState(marker.title);
-  const [radius, setRadius] = useState(marker.radius);
-  const [showRadius, setShowRadius] = useState(marker.showRadius);
-  const [minRadius, setMinRadius] = useState(marker.minRadius);
-  const [maxRadius, setMaxRadius] = useState(marker.maxRadius);
+  const getMarkerState = (m) => {
+    return {
+      title: m.trigger(MarkerComponentEvents.MetadataComponent().getTitle()),
+      radius: m.getMarkerRadius(),
+      showRadius: m.trigger(
+        MarkerComponentEvents.RadiusComponent().getShowRadius()
+      ),
+      minRadius: m.trigger(
+        MarkerComponentEvents.RadiusComponent().getMinRadius()
+      ),
+      maxRadius: m.trigger(
+        MarkerComponentEvents.RadiusComponent().getMaxRadius()
+      ),
+    };
+  };
+  const setMarkerState = (m, key, value) => {
+    switch (key) {
+      case "title":
+        m.trigger(MarkerComponentEvents.MetadataComponent().setTitle(value));
+        break;
+      case "radius":
+        m.setMarkerRadius(value);
+        break;
+      case "showRadius":
+        m.trigger(MarkerComponentEvents.RadiusComponent().setShowRadius(value));
+        break;
+      case "minRadius":
+        m.trigger(MarkerComponentEvents.RadiusComponent().setMinRadius(value));
+        break;
+      case "maxRadius":
+        m.trigger(MarkerComponentEvents.RadiusComponent().setMaxRadius(value));
+        break;
+      default:
+        console.log("Unahdled event");
+    }
+  };
+
+  const reducer = (state, action) => {
+    switch (action.type) {
+      case "update":
+        return { ...state, [action.key]: action.value };
+      case "resetAll":
+        return action.newState;
+      default:
+        return state;
+    }
+  };
+  const [state, dispatch] = useReducer(reducer, getMarkerState(marker));
+  const { title, radius, showRadius, minRadius, maxRadius } = state;
+
+  const onChange = (key, value) => {
+    dispatch({ type: "update", key, value });
+    setMarkerState(marker, key, value);
+  };
 
   useEffect(() => {
-    setTitle(marker.title);
-    setRadius(marker.radius);
-    setShowRadius(marker.showRadius);
-    setMinRadius(marker.minRadius);
-    setMaxRadius(marker.maxRadius);
+    const newState = getMarkerState(marker);
+    dispatch({ type: "resetAll", newState });
   }, [marker]);
-
-  useEffect(() => {
-    marker.title = title;
-  }, [marker, title])
-
-  useEffect(() => {
-    marker.setRadius(radius);
-  }, [marker, radius]);
-
-  useEffect(() => {
-    marker.setShowRadius(showRadius);
-  }, [marker, showRadius]);
-
-  useEffect(() => {
-    marker.minRadius = minRadius;
-  }, [marker, minRadius]);
-
-  useEffect(() => {
-    marker.maxRadius = maxRadius;
-  }, [marker, maxRadius]);
 
   return (
     <div className={styles.containerStyle}>
       <div className={styles.titleField}>
-        <TextInput value={title} onChange={(e) => setTitle(e.target.value)} />
+        <TextInput
+          value={title}
+          onChange={(e) => {
+            onChange("title", e.target.value);
+          }}
+        />
       </div>
 
-      <button className={styles.closeButton} onClick={() => marker.deselect()}>
+      <button
+        className={styles.closeButton}
+        onClick={() => {
+          marker.trigger(
+            MarkerComponentEvents.SelectableComponent().deselect()
+          );
+        }}
+      >
         Close
       </button>
 
       <Checkmark
         label={"Show radius"}
         state={showRadius}
-        setState={(e) => setShowRadius(e.target.checked)}
+        setState={(e) => {
+          onChange("showRadius", e.target.checked);
+        }}
       />
 
       {showRadius && (
         <div className={styles.radiusContainer}>
-
           <div className={styles.radiusSettings}>
             <TextInput
               label={"Min Radius"}
               value={minRadius}
-              onChange={(e) => setMinRadius(e.target.value)}
+              onChange={(e) => {
+                onChange("minRadius", e.target.value);
+              }}
             />
             <TextInput
               rightLabel={"Max Radius"}
               value={maxRadius}
-              onChange={(e) => setMaxRadius(e.target.value)}
+              onChange={(e) => {
+                onChange("maxRadius", e.target.value);
+              }}
             />
           </div>
 
@@ -79,14 +123,21 @@ const MarkerConfiguration = ({ marker }) => {
             max={maxRadius}
             step={1}
             value={radius}
-            setValue={setRadius}
+            setValue={(value) => {
+              onChange("radius", value);
+            }}
           />
         </div>
       )}
 
       <div className={styles.spacing}></div>
 
-      <button className={styles.deleteButton} onClick={() => marker.delete()}>
+      <button
+        className={styles.deleteButton}
+        onClick={() => {
+          marker.trigger(MarkerComponentEvents.DeletableComponent().delete());
+        }}
+      >
         Delete
       </button>
     </div>

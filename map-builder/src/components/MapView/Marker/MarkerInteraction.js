@@ -17,6 +17,10 @@ class MarkerInteraction {
   getObject() {
     return this.object;
   }
+
+  clone() {
+    return new MarkerInteraction(this.type, this.object);
+  }
 }
 
 export class SelectInteraction extends MarkerInteraction {

@@ -3,13 +3,11 @@ import styles from "./MapView.module.css";
 import { location as defaultLocation } from "./Helpers/MapViewConstants";
 
 import { useMap } from "./Hooks/useMap";
-import { useMapEventInteractions } from "./Hooks/useMapEventInteractions";
-
 import { useMapMarkers } from "./Hooks/MarkerHandling/useMapMarkers";
-import { useMapSingleclick } from "./Hooks/Interactions/useMapSingleclick";
-
 import { useMarkerInteraction } from "./Hooks/MarkerHandling/useMarkerInteraction";
+import { useMapSingleclick } from "./Hooks/Interactions/useMapSingleclick";
 import { useMapPointerdrag } from "./Hooks/Interactions/useMapPointerdrag";
+import { useMapEventInteractions } from "./Hooks/useMapEventInteractions";
 
 const MapView = ({ onMapInteracted }) => {
   const mapContainerId = "map-container";

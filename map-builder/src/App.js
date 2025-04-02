@@ -10,12 +10,33 @@ import { useMapInteractionHandler } from "./components/SubmitForm/Hooks/useMapIn
 import SubmitButton from "./components/CustomViews/SubmitButton/SubmitButton";
 
 function App() {
-  const { markers, selectedMarker, onMapInteractedHandler } = useMapInteractionHandler();
+  const { markers, selectedMarker, onMapInteractedHandler } =
+    useMapInteractionHandler();
+
+
+    function downloadJSON(filename, jsonData) {
+      const jsonString = JSON.stringify(jsonData, null, 2);
+
+      const blob = new Blob([jsonString], { type: "application/json" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.style.display = "none";
+      a.href = url;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
 
   // MARK: - Form handler
 
   const submitButtonHandler = () => {
-    console.log("Submitting markers: ", markers);
+    const markerConfigs = markers.map((marker) => marker.exportConfiguration());
+    downloadJSON("markers.json", markerConfigs);
   };
 
   // MARK: - Render

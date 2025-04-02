@@ -5,6 +5,8 @@ import {
   deactivateInteractions,
 } from "../../Helpers/MapViewHelpers";
 
+import { MarkerComponentEvents } from "../../Marker/MarkerComponentEvents";
+
 export const useMapPointerdrag = ({ mapRef, currentMarkerId }) => {
   const onMapPointerDrag = useCallback(
     (event) => {
@@ -14,7 +16,11 @@ export const useMapPointerdrag = ({ mapRef, currentMarkerId }) => {
       const marker = map.getFeaturesAtPixel(event.pixel)?.[0];
       const markerId = marker?.getId();
       if (currentMarkerId && markerId === currentMarkerId) {
-        marker.setCoordinates(event.coordinate);
+        marker.trigger(
+          MarkerComponentEvents.MovableComponent().setMapEventCoordinates(
+            event.coordinate
+          )
+        );
         deactivateInteractions(map);
         return;
       }

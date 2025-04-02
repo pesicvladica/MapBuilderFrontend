@@ -1,22 +1,32 @@
 import { useCallback, useEffect } from "react";
+import { MarkerComponentEvents } from "../../Marker/MarkerComponentEvents";
 
-export const useMapSelectMarker = ({
-  markers,
-  previousMarkerId,
-}) => {
+export const useMapSelectMarker = ({ markers, previousMarkerId }) => {
   const selectMarker = useCallback(
-    (markerId) =>
-      markers?.find((marker) => marker.getId() === markerId)?.select(),
+    (markerId) => {
+      const marker = markers?.find((marker) => marker.getId() === markerId);
+      if (marker) {
+        marker.trigger(MarkerComponentEvents.SelectableComponent().select());
+      }
+    },
     [markers]
   );
+  
   const deselectMarker = useCallback(
-    (markerId) =>
-      markers?.find((marker) => marker.getId() === markerId)?.deselect(),
+    (markerId) => {
+      const marker = markers?.find((marker) => marker.getId() === markerId);
+      if (marker) {
+        marker.trigger(MarkerComponentEvents.SelectableComponent().deselect());
+      }
+    },
     [markers]
   );
 
   useEffect(() => {
-    markers?.find((marker) => marker.getId() === previousMarkerId)?.deselect();
+    const marker = markers?.find((marker) => marker.getId() === previousMarkerId);
+    if (marker) {
+      marker.trigger(MarkerComponentEvents.SelectableComponent().deselect());
+    }
   }, [markers, previousMarkerId]);
 
   return { selectMarker, deselectMarker };
